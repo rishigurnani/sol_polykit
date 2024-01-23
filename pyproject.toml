@@ -6,7 +6,7 @@ authors = ["Rishi Gurnani <rgurnani96@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-rdkit-pypi = "^2021.9"
+rdkit-pypi = "^2022.9"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

@@ -4,6 +4,52 @@ import warnings
 
 from sol_polykit.utils import n_to_subtract
 
+def get_rotatable_atoms(mol):
+    """
+    Returns a set of atom indices that are part of rotatable bonds in the given molecule.
+    
+    Parameters:
+        mol (Chem.Mol): RDKit molecule object.
+    
+    Returns:
+        set: A set of atom indices involved in rotatable bonds.
+    """
+    # Define the SMARTS pattern for rotatable bonds
+    rotatable_bond_smarts = Chem.MolFromSmarts('[!$(*#*)&!D1]-&!@[!$(*#*)&!D1]')
+    
+    # Get all rotatable bonds based on the SMARTS pattern
+    rotatable_bonds = mol.GetSubstructMatches(rotatable_bond_smarts)
+    
+    # Extract unique atoms involved in rotatable bonds
+    rotatable_atoms = set()
+    for bond in rotatable_bonds:
+        for atom in bond:
+            rotatable_atoms.add(atom)
+    
+    return rotatable_atoms
+
+
+def get_sidechain_rotatable_atoms(linear_pol):
+    """
+    Returns a list of rotatable atoms that are in the sidechain of the given LinearPol object.
+    
+    Parameters:
+        linear_pol (LinearPol): LinearPol object.
+    
+    Returns:
+        list: A list of atom indices that are rotatable and in the sidechain.
+    """
+    # Compute rotatable atoms for the entire molecule
+    all_rotatable_atoms = get_rotatable_atoms(linear_pol.mol)
+    
+    # Find the main chain atoms
+    main_chain_atoms = linear_pol.get_main_chain(include_endpoints=True)
+    
+    # Find the rotatable atoms that are not in the main chain
+    sidechain_rotatable_atoms = all_rotatable_atoms - main_chain_atoms
+    
+    return list(sidechain_rotatable_atoms)
+
 
 class Polymer(Chem.rdchem.Mol):
     def __init__(self) -> None:
